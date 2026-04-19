@@ -1,0 +1,135 @@
+Device: cuda
+Effective limits (None = use full split): POS train/val caps=None/None, STS-B train/val caps=None/None, batch POS/STSB=12/12, epochs POS/STSB=3/3, max_len POS/STSB=128/128.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+config.json: 100%
+ 570/570 [00:00<00:00, 53.9kB/s]
+tokenizer_config.json: 100%
+ 48.0/48.0 [00:00<00:00, 6.25kB/s]
+vocab.txt: 
+ 232k/? [00:00<00:00, 8.92MB/s]
+tokenizer.json: 
+ 466k/? [00:00<00:00, 9.27MB/s]
+model.safetensors: 100%
+ 440M/440M [00:02<00:00, 193MB/s]
+Loading weights: 100%
+ 199/199 [00:00<00:00, 854.39it/s, Materializing param=pooler.dense.weight]
+BertModel LOAD REPORT from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+BERT layers (encoder): 12, hidden size: 768
+Total parameters: 109,482,240 (frozen)
+README.md: 
+ 18.9k/? [00:00<00:00, 1.42MB/s]
+Repo card metadata block was not found. Setting CardData to empty.
+Note: Qwerty66/UD_english-EWT has no packaged dataset script (raw .conllu only). Loading train/dev/test CoNLL-U files from the Hub.
+en_ewt-ud-train.conllu: 100%
+ 14.5M/14.5M [00:00<00:00, 47.3MB/s]
+en_ewt-ud-dev.conllu: 
+ 1.84M/? [00:00<00:00, 73.8MB/s]
+en_ewt-ud-test.conllu: 
+ 1.84M/? [00:00<00:00, 91.9MB/s]
+
+=== UD English EWT (POS) ===
+DatasetDict({
+    train: Dataset({
+        features: ['tokens', 'upos'],
+        num_rows: 12544
+    })
+    validation: Dataset({
+        features: ['tokens', 'upos'],
+        num_rows: 2001
+    })
+    test: Dataset({
+        features: ['tokens', 'upos'],
+        num_rows: 2077
+    })
+})
+Splits: ['train', 'validation', 'test']
+  [train] columns: ['tokens', 'upos'], n=12544
+  [validation] columns: ['tokens', 'upos'], n=2001
+  [test] columns: ['tokens', 'upos'], n=2077
+POS columns: tokens='tokens', labels='upos'
+Scanning POS labels: 100%
+ 12544/12544 [00:00<00:00, 20625.58it/s]
+num_labels (POS): 17
+Map: 100%
+ 12544/12544 [00:07<00:00, 1639.92 examples/s]
+Map: 100%
+ 2001/2001 [00:01<00:00, 1694.27 examples/s]
+README.md: 
+ 35.3k/? [00:00<00:00, 3.35MB/s]
+stsb/train-00000-of-00001.parquet: 100%
+ 502k/502k [00:00<00:00, 4.09MB/s]
+stsb/validation-00000-of-00001.parquet: 100%
+ 151k/151k [00:00<00:00, 726kB/s]
+stsb/test-00000-of-00001.parquet: 100%
+ 114k/114k [00:00<00:00, 473kB/s]
+Generating train split: 100%
+ 5749/5749 [00:00<00:00, 116023.53 examples/s]
+Generating validation split: 100%
+ 1500/1500 [00:00<00:00, 88470.01 examples/s]
+Generating test split: 100%
+ 1379/1379 [00:00<00:00, 97680.33 examples/s]
+
+=== GLUE STS-B ===
+DatasetDict({
+    train: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 5749
+    })
+    validation: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 1500
+    })
+    test: Dataset({
+        features: ['sentence1', 'sentence2', 'label', 'idx'],
+        num_rows: 1379
+    })
+})
+Splits: ['train', 'validation', 'test']
+  [train] columns: ['sentence1', 'sentence2', 'label', 'idx'], n=5749
+  [validation] columns: ['sentence1', 'sentence2', 'label', 'idx'], n=1500
+  [test] columns: ['sentence1', 'sentence2', 'label', 'idx'], n=1379
+Map: 100%
+ 5749/5749 [00:02<00:00, 3177.10 examples/s]
+Map: 100%
+ 1500/1500 [00:00<00:00, 2473.90 examples/s]
+[debug] POS batch input_ids: (12, 128)
+[debug] STS-B batch input_ids: (12, 128)
+Probing per layer: 100%
+ 12/12 [1:39:55<00:00, 500.50s/it]
+Merged LOO ablation per layer: 100%
+ 12/12 [06:02<00:00, 30.17s/it]
+Saved: ./pos_probe_results.csv
+Saved: ./stsb_probe_results.csv
+Saved: ./pos_merged_ablation_results.csv
+Saved: ./stsb_merged_ablation_results.csv
+Saved figure: ./pos_layer_vs_f1.png
+Saved figure: ./stsb_layer_vs_pearson.png
+Saved figure: ./pos_merged_layer_vs_f1_drop.png
+Saved figure: ./stsb_merged_layer_vs_pearson_drop.png
+Saved figure: pos_probe_vs_ablation_normalized.png
+Saved figure: stsb_probe_vs_ablation_normalized.png
+Saved figure: ./combined_probing_normalized.png
+
+=== RESULTS SUMMARY ===
+Best POS macro F1 layer (validation, per-layer probe): 6 (F1=0.9171)
+Best STS-B Pearson layer (validation, per-layer probe): 5 (r=0.8116)
+Largest merged LOO POS macro F1 drop at encoder layer: 11 (drop=0.0022)
+Largest merged LOO STS-B Pearson drop at encoder layer: 10 (drop=0.0081)
+
+=== INTERPRETATION (safe wording) ===
+Per-layer POS probing (macro F1) is highest around layer 6, suggesting that representations in that region encode useful token-level information for POS under this linear readout.
+Per-layer STS-B probing (Pearson) peaks near layer 5, suggesting that representations in that region contribute to sentence-level similarity scores under this linear readout.
+Merged leave-one-layer-out ablation: omitting encoder layer 11 from the mean merge hurts the frozen merged POS head the most by macro F1 drop, suggesting that layer contributes strongly to the combined representation for that readout.
+Merged leave-one-layer-out ablation: omitting encoder layer 10 from the pooled-then-mean merge hurts the frozen merged STS-B head the most by Pearson drop, suggesting that layer contributes strongly to the combined representation for that readout.
