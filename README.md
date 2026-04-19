@@ -1,81 +1,169 @@
 # 🔍 Layer-wise Analysis of BERT (Probing vs Ablation)
 
-This project explores how different layers of **BERT (12-layer encoder)** represent and contribute to:
+This project investigates how different layers of **BERT (12-layer encoder)** represent and contribute to language understanding.
 
-- **POS Tagging (Syntax)**
-- **STS-B (Semantic Similarity)**
+Instead of focusing only on performance, we aim to understand:
+- what each layer learns  
+- where information is stored  
+- how different layers contribute to final predictions  
 
-Instead of only looking at performance, we try to understand *what each layer is actually doing* using two complementary methods:
+---
 
-- **Linear Probing** → How much information can we extract from a single layer?  
-- **Merged Leave-One-Layer-Out Ablation** → How much does a layer contribute to the final combined representation?
+## 🎯 Objective
+
+Modern transformer models like BERT are often treated as black boxes. A common assumption is:
+
+> “Deeper layers capture more complex understanding.”
+
+However, this assumption mixes two different ideas:
+
+- **Representation** → what information a layer contains  
+- **Contribution** → how important that layer is for prediction  
+
+This project separates these two by asking:
+
+1. Where is task-related information stored in BERT?  
+2. Which layers actually matter for making predictions?  
+3. Do the most informative layers also contribute the most?
+
+We analyze this across two types of tasks:
+- **Syntax POS tagging(Parts Of Speecch tagging)**  
+- **Semantics (similarity between two sentences)**  
+
+---
+
+## 📘 Tasks
+
+### POS Tagging (Syntax)
+Assigns grammatical roles to each word in a sentence.
+
+Example:
+The cat sat on the mat → DET NOUN VERB ADP DET NOUN  
+
+This task evaluates how well the model understands **sentence structure**.
+
+---
+
+### STS-B (Semantic Similarity)
+Measures how similar two sentences are.
+
+Example:
+“A man is eating food”  
+“A person is having a meal”  
+→ High similarity  
+
+This task evaluates **meaning understanding**.
+
+---
+
+## 🔬 Methodology
+
+We use two complementary techniques:
+
+### 1. Linear Probing (Information Extraction)
+
+For each BERT layer:
+- Extract hidden representations
+- Freeze BERT (no training)
+- Train a simple **linear classifier/regressor**
+
+This answers:
+
+> “How much task-relevant information is present in this layer?”
+
+- POS → token-level classification  
+- STS-B → sentence-level regression (after pooling)  
+
+---
+
+### 2. Merged Leave-One-Layer-Out Ablation (Contribution)
+
+Instead of using a single layer:
+
+- Combine all layers using **mean pooling**
+- Train one linear model on the merged representation
+
+Then for each layer:
+- Remove that layer from the merge
+- Evaluate performance drop (without retraining)
+
+This answers:
+
+> “How much does this layer contribute to the full representation?”
+
+---
+
+### Why both?
+
+- Probing → **what a layer knows**  
+- Ablation → **what the model uses**
+
+Comparing them reveals:
+- redundancy  
+- indirect contributions  
+- mismatch between knowledge and usage  
 
 ---
 
 ## 📊 Results
 
-### Combined Probing (Normalized)
-
 ![Probing Results](Results/Full%20Run%201/combined_probing_normalized.png)
 
 ---
 
-## 🧠 Key Findings
+## 🧠 Findings
 
-### 1. Mid-layers are the most informative
+### 1. Mid-layers are most informative
 
 - POS peaks at **layer 6 (F1 ≈ 0.917)**
 - STS-B peaks at **layer 5 (Pearson ≈ 0.81)**  
 
-This suggests that **intermediate layers capture the most useful features** for both syntax and semantics.
+👉 Intermediate layers encode the strongest task-relevant features.
 
 ---
 
-### 2. Top layers contribute more to the final representation
+### 2. Higher layers contribute more to final predictions
 
 - POS ablation peak → **layer 11**
 - STS-B ablation peak → **layer 10**
 
-So even though these layers are not the best individually, they still play an important role when all layers are combined.
+👉 Higher layers help **refine and combine information**, even if they are not the best individually.
 
 ---
 
-### 3. A key insight
+### 3. Probing and ablation do not align
 
-> **Information ≠ Importance**
+- Best probing layers ≠ most impactful layers  
 
-A layer can:
-- contain useful information (high probing score)
-- but still not be critical to the final prediction (low ablation impact)
+This shows:
+
+- Some layers are **informative but redundant**  
+- Some layers contribute **indirectly**  
 
 ---
 
 ## 📌 Interpretation
 
-Putting everything together:
-
-- Information is **distributed across layers**, not isolated
-- Middle layers → best for **extracting features**
-- Higher layers → help **refine and combine representations**
-- There is strong **redundancy** — removing a single layer barely hurts performance
+- Information in BERT is **distributed across layers**
+- Middle layers → strongest for **feature extraction**
+- Higher layers → involved in **aggregation**
+- Removing one layer causes only small drops → **high redundancy**
 
 ---
 
 ## ⚠️ Limitations
 
-This experiment gives useful insights, but there are some important limitations:
-
 - **Mean merging is simplistic**  
-  We combine layers using a simple average, which may smooth out differences and make layers appear more redundant than they actually are.
+  Averaging layers smooths differences and may hide true importance.
 
 - **Ablation is not fully causal**  
-  We remove layers from a merged representation, not from the internal transformer computation. So this does not reflect true causal importance inside BERT.
+  Layers are removed only from the merged representation, not from internal transformer computation.
 
 - **Linear probes are limited**  
-  Since we use only a linear classifier, we only measure *linearly accessible information*. Some information might exist but not be linearly separable.
+  Only linearly accessible information is measured.
 
-- **Single run (no variance analysis)**  
-  Results are based on one run. Layer rankings may shift slightly across different seeds or setups.
+- **Single run**  
+  Results may vary slightly with different seeds.
 
 ---
 
@@ -84,16 +172,6 @@ This experiment gives useful insights, but there are some important limitations:
 - Model: `bert-base-uncased` (frozen)
 - Tasks:
   - POS (UD English EWT)
-  - STS-B (GLUE)
-- Probes: Linear classifier / regressor
+  - STS-B (GLUE benchmark)
+- Probe: Linear classifier / regressor
 - Ablation: Mean merged leave-one-layer-out
-
----
-
-## 🚀 Takeaway
-
-> Just because a layer makes information easy to extract does not mean it is essential for the model’s final behavior.
-
-This highlights an important distinction between:
-- **what a model knows (representation)**
-- and **what it actually uses (contribution)**
